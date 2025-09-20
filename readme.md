@@ -12,3 +12,5 @@ fov13@txstate.edu
 
 ### En
 kyr27@txstate.edu
+
+#structuring
