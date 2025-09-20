@@ -1,13 +1,14 @@
-class 3354.r01
-doc
+#class 3354.r01 Chess
 
 
 
-Contact Info:
+##Contact Info:
 
-Corbin 630-405-3562
+###Corbin 
+630-405-3562
 
-Josh
+###Josh
+fov13@txstate.edu
 
-En
-
+###En
+kyr27@txstate.edu
