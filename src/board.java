@@ -2,6 +2,8 @@
 package board;//
 public class board{
 //creates an instance of peices??
+  //creates and intiial board
+  //stores the state of board
   
   
 }
