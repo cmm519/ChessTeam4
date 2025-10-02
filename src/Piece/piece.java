@@ -2,6 +2,7 @@
 package board;
 
 public abstract class pieces{
+  public char color; //w or b
   
   //attribuite suggested color and position 
   possibleMoves();//method to return possible moves FROM THE CURRENT POSITION
