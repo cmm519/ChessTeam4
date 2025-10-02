@@ -1,10 +1,12 @@
-//need 8x8 array or 2 int places as an abstract arrayy
+//need 8x8
 package board;//
 public class board{
+    public piece[][] board = new piece[8][8]; //array of pieces
+
 
   
-  public void resetBoard()//taken from https://www.geeksforgeeks.org/dsa/design-a-chess-game/
-    {
+/* public void resetBoard()//taken from https://www.geeksforgeeks.org/dsa/design-a-chess-game/
+   {
         // initialize white pieces
         boxes[0][0] = new Spot(0, 0, new rook(true)); //Supporting classes incomplete at this tie 10/1
         boxes[0][1] = new Spot(0, 1, new knight(true));
@@ -29,7 +31,7 @@ public class board{
                 boxes[i][j] = new Spot(i, j, null);
             }
         }
-    }
+    }*/
 }
 //creates an instance of peices??
   //creates and intiial board
