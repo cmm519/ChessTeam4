@@ -1,5 +1,5 @@
-package board;
-public class queen extends piece{
+import Board;
+public class Queen extends piece{
 // define valid moves within 
 }
 

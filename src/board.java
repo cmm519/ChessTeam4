@@ -1,6 +1,6 @@
 //need 8x8
-package board;//
-public class board{
+package Board;//
+public class Board{
     //in progress
     public piece[][] board = new piece[8][8]; //array of pieces
 

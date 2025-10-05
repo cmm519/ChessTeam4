@@ -1,4 +1,4 @@
-package board;
-public class rook extends piece{
+import Board;
+public class Rook extends piece{
 // define valid moves within 
 }
