@@ -3,6 +3,15 @@ package board;//
 public class board{
     public piece[][] board = new piece[8][8]; //array of pieces
 
+/*    getPiece(PosiLon posiLon): Returns the piece at the specified posiLon.
+ 
+    movePiece(PosiLon from, PosiLon to): Moves a piece from one square to another.
+
+    isCheck(Color color): Checks if a given color is in check.
+
+    isCheckmate(Color color): Checks if a given color is in checkmate.
+
+    display(): Prints the board to the console.
 
   
 /* public void resetBoard()//taken from https://www.geeksforgeeks.org/dsa/design-a-chess-game/
@@ -32,10 +41,5 @@ public class board{
             }
         }
     }*/
-}
-//creates an instance of peices??
-  //creates and intiial board
-  //stores the state of board
-  
-  
+    }  
 }
