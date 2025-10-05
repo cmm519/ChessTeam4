@@ -1,5 +1,6 @@
 package board;
-public class bishop extends piece{
+public class Bishop extends piece{
 // define valid moves within 
 }
+
 
