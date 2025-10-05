@@ -1,5 +1,6 @@
 package board;
-public class king extends piece{
+public class King extends piece{
 // define valid moves within 
 }
+
 
