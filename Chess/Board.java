@@ -8,16 +8,16 @@ public class Board {
         this.initialize();
     }
 
-    private void initialize(){
-        for(int x = 0; x<board.length; x++){
-            for(int y = 0; y<board[0].length; y++){
+    private void initialize(){//fill array with null
+        for(int x = 0; x<8; x++){//cutting .lenth() when unnecessary
+            for(int y = 0; y<8; y++){
                 board[x][y] = null;
             }
         }
 
         // White pawns
         for(int x=0; x<8; x++){
-            board[1][x] = new Pawn("white");
+            board[1][x] = new Pawn("white");//
         }
 
         // Black pawns
@@ -81,6 +81,8 @@ public class Board {
      *
      * @throws IOException
      */
+    //TODO continue input after exception
+    //TODO print message on invalid move 
     public void performMove(String move, String color, boolean actuallyMove) throws IOException{
         int[] moveArray = parseInput(move);
         //System.out.println(board[moveArray[0]][moveArray[1]]);
