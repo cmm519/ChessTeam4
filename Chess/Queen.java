@@ -13,10 +13,11 @@ public class Queen extends Piece{
 		return new Rook(color).validateMove(board, currentRow, currentCol, newRow, newCol) || new Bishop(color).validateMove(board, currentRow, currentCol, newRow, newCol);
 	}
 	
+	@Override
 	public String getColor(){
 		return this.color;
 	}
-	
+	@Override
 	public String toString(){
 		return color.charAt(0) + "Q";
 		

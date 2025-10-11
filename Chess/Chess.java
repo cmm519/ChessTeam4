@@ -6,8 +6,7 @@ public class Chess {
      * @param args
      */
     public static void main(String[] args) {
-        //TODO Auto-generated method stub
-
+        
         Board gameBoard = new Board();
         String color = "white";
 
@@ -41,6 +40,7 @@ public class Chess {
             } catch (IOException e) {
                 // Ask for user input again
                 System.out.println("Invalid input!");
+                System.out.println();
                 continue;
             }
 

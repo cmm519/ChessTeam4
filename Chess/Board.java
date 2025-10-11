@@ -81,8 +81,7 @@ public class Board {
      *
      * @throws IOException
      */
-    //TODO continue input after exception
-    //TODO print message on invalid move 
+
     public void performMove(String move, String color, boolean actuallyMove) throws IOException{
         int[] moveArray = parseInput(move);
         //System.out.println(board[moveArray[0]][moveArray[1]]);
@@ -157,11 +156,11 @@ public class Board {
                     }
                     if(piece.getColor().equals("white")){
                         if(moveArray[2] == 7){
-                            switch(move.split(" ")[2].charAt(0)){
-                                case 'N': replacement = new Knight("white"); break;
-                                case 'B': replacement = new Bishop("white"); break;
-                                default: replacement = new Queen("white"); break;
-                            }
+                            replacement = switch (move.split(" ")[2].charAt(0)) {
+                                case 'N' -> new Knight("white");
+                                case 'B' -> new Bishop("white");
+                                default -> new Queen("white");
+                            };
                             board[moveArray[2]][moveArray[3]] = replacement;
                         }
                     }else{
@@ -175,39 +174,8 @@ public class Board {
                         }
                     }
 
-                    //En passante capture
-                    /*int newCol = moveArray[3];
-                      int newRow = moveArray[2];
-                      if(inSixthRank(color, newRow)){
-                      if(newCol + 1 < 8){
-                      if(board[newRow][newCol + 1] != null){
-                      if(board[newRow][newCol + 1].getClass().isInstance(new Pawn("white"))){
-                      if(board[][].ep_able){
-                      board[][] = null;
-                      }
-                      }
-                      }
-                      }else if(newCol - 1 > 0){
-                      if(board[newRow][newCol - 1] != null){
-                      if(board[newRow][newCol - 1].getClass().isInstance(new Pawn("white"))){
-                      if(board[][].ep_able){
-                      board[][] = null;
-                      }
-                      }
-                      }
-                      }
-                      }*/
-
                 }
             }
-        }
-    }
-
-    private boolean inSixthRank(String color, int rank){
-        if(color.equals("white")){
-            return rank == 5;
-        }else{
-            return rank == 2;
         }
     }
 
@@ -215,6 +183,7 @@ public class Board {
      * Parses the user's string input for a move
      * @param move
      * @return An array of size 4 with the initial x, y positions and the final x, y positions in that order
+     * TODO this throws out of bounds exceptions. Need to trace
      */
     public static int[] parseInput(String move){
         int[] returnArray = new int[4];
@@ -383,7 +352,7 @@ public class Board {
 
         String reverseString = "";
 
-        reverseString += "  a  b  c  d  e  f  g  h \n";
+        reverseString += "  a  b  c  d  e  f  g  h \n";//wt
         String[] stringSplit = string.split("\n");
         for(int x = stringSplit.length-1; x >= 0; x--){
             reverseString += x+1 + " " + stringSplit[x] + "\n";
