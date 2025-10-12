@@ -13,7 +13,7 @@ public abstract class Piece {
 	/**
 	 * Moves the piece 
 	 * 
-	 * @return true if the move was valid or not.
+	 * @return true if the move was valid or not.Each peice has an override of this method
 	 */
 	public abstract boolean validateMove(Piece[][] board, int currentRow, int currentCol, int newRow, int newCol);
 

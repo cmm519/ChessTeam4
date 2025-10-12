@@ -46,11 +46,11 @@ public class Bishop extends Piece{
 		return true;
 		
 	}
-	
+	@Override
 	public String getColor(){
 		return this.color;
 	}
-	
+	@Override
 	public String toString(){
 		return color.charAt(0) + "B";
 		

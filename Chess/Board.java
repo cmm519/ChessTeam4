@@ -180,26 +180,55 @@ public class Board {
     }
 
     /**
-     * Parses the user's string input for a move
-     * @param move
-     * @return An array of size 4 with the initial x, y positions and the final x, y positions in that order
-     * TODO this throws out of bounds exceptions. Need to trace
+     * Parses the user's string input for a move, with validation.
+     * @param move The user's input string (e.g., "a2 a4").
+     * @return An array of size 4 with the initial row, col and the final row, col.
+     * @throws IOException if the input format is invalid.
      */
-    public static int[] parseInput(String move){
-        int[] returnArray = new int[4];
+    public static int[] parseInput(String move) throws IOException {
+        // Trim whitespace and split the string by one or more spaces.
+        String[] parts = move.trim().split("\\s+");
 
-        String[] split = move.split(" ");
-        returnArray[1] = charToInt(Character.toLowerCase(split[0].charAt(0)));
-        returnArray[0] = Integer.parseInt(move.charAt(1) + "") - 1;
+        // 1. Check if the input is split into exactly two parts.
+        if (parts.length != 2) {
+            throw new IOException("Invalid move format. Expected two coordinates separated by a space (e.g., 'e2 e4').");
+        }
 
-        returnArray[3] = charToInt(Character.toLowerCase(split[1].charAt(0)));
-        returnArray[2] = Integer.parseInt(split[1].charAt(1) + "") - 1;
-        return returnArray;
+        String from = parts[0];
+        String to = parts[1];
 
+        // 2. Check if both coordinate strings are exactly two characters long.
+        if (from.length() != 2 || to.length() != 2) {
+            throw new IOException("Invalid coordinate format. Each coordinate must be two characters (e.g., 'a1').");
+        }
+
+        try {
+            // 3. Parse the 'from' coordinate.
+            int fromCol = charToInt(Character.toLowerCase(from.charAt(0)));
+            int fromRow = Integer.parseInt(from.substring(1)) - 1;
+
+            // 4. Parse the 'to' coordinate.
+            int toCol = charToInt(Character.toLowerCase(to.charAt(0)));
+            int toRow = Integer.parseInt(to.substring(1)) - 1;
+
+            // 5. Verify that the coordinates are within the board's bounds (0-7).
+            if (fromCol > 7 || fromRow < 0 || fromRow > 7 || toCol > 7 || toRow < 0 || toRow > 7) {
+                throw new IOException("Coordinates are outside the board. Columns are 'a'-'h', rows are '1'-'8'.");
+            }
+            
+            // Return the coordinates in the order your program expects: [fromRow, fromCol, toRow, toCol]
+            return new int[]{fromRow, fromCol, toRow, toCol};
+
+        } catch (NumberFormatException e) {
+            // This catches errors if the row part of the coordinate is not a number (e.g., "ae a4").
+            throw new IOException("Invalid row format. The second character of a coordinate must be a number (1-8).");
+        }
     }
 
     /**
-     * Returns an integer corresponding to the user input
+     * Converts a column character ('a'-'h') to its corresponding integer index (0-7).
+     * @param ch The column character.
+     * @return The integer index of the column, or 8 if the character is invalid.
      */
     public static int charToInt(char ch){
         switch(ch){
@@ -214,11 +243,13 @@ public class Board {
             default: return 8;
         }
     }
-
+/**
+     * Dummy parsing function to convert a character to an integer
+     */
     private int[] getKingPos(String color){
         int row = 0, col = 0;
 
-        for(int x = 0; x<board.length; x++){
+        for(int x = 0; x<8; x++){
             for(int y = 0; y<board[0].length; y++){
                 if(board[x][y] != null){
                     if(board[x][y].getClass().isInstance(new King("white")) && board[x][y].getColor().equals(color)){
@@ -319,7 +350,7 @@ public class Board {
     public boolean staleMate(String color){
         return false;
     }
-
+    @Override
     public String toString(){
         String string = "";
         int fileCount = 0;
@@ -353,7 +384,7 @@ public class Board {
         String reverseString = "";
 
         reverseString += "  a  b  c  d  e  f  g  h \n";//wt
-        String[] stringSplit = string.split("\n");
+        String[] stringSplit = string.split("\n");//
         for(int x = stringSplit.length-1; x >= 0; x--){
             reverseString += x+1 + " " + stringSplit[x] + "\n";
         }
