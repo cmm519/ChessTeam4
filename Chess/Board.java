@@ -184,6 +184,7 @@ public class Board {
      * @param move The user's input string (e.g., "a2 a4").
      * @return An array of size 4 with the initial row, col and the final row, col.
      * @throws IOException if the input format is invalid.
+     * TODO fix exception text, throws exception correctly but catch message is not updated 
      */
     public static int[] parseInput(String move) throws IOException {
         // Trim whitespace and split the string by one or more spaces.
@@ -191,7 +192,7 @@ public class Board {
 
         // 1. Check if the input is split into exactly two parts.
         if (parts.length != 2) {
-            throw new IOException("Invalid move format. Expected two coordinates separated by a space (e.g., 'e2 e4').");
+            throw new IOException("Invalid move format.Expected two coordinates separated by a space (e.g., 'e2 e4').");
         }
 
         String from = parts[0];
@@ -199,7 +200,7 @@ public class Board {
 
         // 2. Check if both coordinate strings are exactly two characters long.
         if (from.length() != 2 || to.length() != 2) {
-            throw new IOException("Invalid coordinate format. Each coordinate must be two characters (e.g., 'a1').");
+            throw new IOException("INValid coordinate format. Each coordinate must be two characters (e.g., 'a1').");
         }
 
         try {
@@ -213,6 +214,7 @@ public class Board {
 
             // 5. Verify that the coordinates are within the board's bounds (0-7).
             if (fromCol > 7 || fromRow < 0 || fromRow > 7 || toCol > 7 || toRow < 0 || toRow > 7) {
+                System.out.println("debug217");
                 throw new IOException("Coordinates are outside the board. Columns are 'a'-'h', rows are '1'-'8'.");
             }
             

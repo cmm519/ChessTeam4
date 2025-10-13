@@ -6,7 +6,7 @@ public class Pawn extends Piece {
     public Pawn(String color, Position position) {
         super(color, position);
     }
-
+    //TODO en passante and promotion
     @Override
     public boolean isValidMove(Position to, Piece[][] board) {
         int dir = color.equals("white") ? -1 : 1;
