@@ -4,22 +4,28 @@ import pieces.*;
 import utils.Position;
 
 /**
- * Represents the chess board and manages its state.
+ * <p>Represents the chess board and manages its state.
  * This class is responsible for creating the 8x8 grid, initializing the pieces
  * in their standard starting positions, handling piece movements, and displaying
  * the board's current state.
+ * 
+ * </p>
  */
 public class Board {
     /**
-     * A 2D array representing the 8x8 chessboard grid.
+     * <p>A 2D array representing the 8x8 chessboard grid.
      * Each element holds a Piece object or is null if the square is empty.
+     * 
+     * </p>
      */
     private Piece[][] grid;
 
     /**
-     * Constructs a new Board instance.
+     * <p>Constructs a new Board instance.
      * It initializes the 8x8 grid and calls the method to place all pieces
      * in their starting positions.
+     * 
+     * </p>
      */
     public Board() {
         grid = new Piece[8][8];
@@ -27,9 +33,11 @@ public class Board {
     }
 
     /**
-     * Sets up the board with all pieces in their standard initial positions.
+     * <p>Sets up the board with all pieces in their standard initial positions.
      * This private helper method is called by the constructor. It places the
      * black and white pieces on their respective ranks.
+     * 
+     * </p>
      */
     private void initializeBoard() {
         String black = "black"; // Used to avoid typos and ensure consistency
@@ -67,20 +75,23 @@ public class Board {
     }
 
     /**
-     * Retrieves the piece at a specified position on the board.
-     * @param pos The {@link Position} object representing the square to check.
-     * @return The {@link Piece} at the given position, or {@code null} if the square is empty.
+     * <p>Retrieves the piece at a specified position on the board.
+     * 
+     * </p>
+     * @param pos The Position object representing the square to check.
+     * @return Info about what will be returned: the Piece at the given position, or null if empty.
      */
     public Piece getPiece(Position pos) {
         return grid[pos.getRow()][pos.getCol()];
     }
 
     /**
-     * Moves a piece from a starting position to a destination position on the grid.
+     * <p>Moves a piece from a starting position to a destination position on the grid.
      * This method updates the grid and the piece's internal position.
-     * It checks if a piece exists at the 'from' position before attempting to move.
-     * @param from The starting {@link Position} of the piece.
-     * @param to The destination {@link Position} for the piece.
+     * 
+     * </p>
+     * @param from The starting Position of the piece.
+     * @param to The destination Position for the piece.
      */
     public void movePiece(Position from, Position to) {
         Piece piece = getPiece(from);
@@ -92,17 +103,20 @@ public class Board {
     }
 
     /**
-     * Gets the entire board grid.
-     * @return A 2D array of {@link Piece} objects representing the current state of the board.
+     * <p>Gets the entire board grid.
+     * 
+     * </p>
+     * @return Info about what will be returned: a 2D array of Piece objects.
      */
     public Piece[][] getGrid() {
         return grid;
     }
 
     /**
-     * Prints a text-based representation of the current board state to the console.
-     * The board is displayed from the perspective of the white player, with rank '1'
-     * at the bottom. Empty squares are represented by "##".
+     * <p>Prints a text-based representation of the current board state to the console.
+     * The board is displayed from the perspective of the white player.
+     * 
+     * </p>
      */
     public void display() {
         System.out.println("\n    A   B   C   D   E   F   G   H");
