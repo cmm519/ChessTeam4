@@ -2,11 +2,10 @@
 package game;
 
 import board.Board;
-import pieces.Piece;
-import utils.Position;
-import utils.MoveValidator;
-
 import java.util.Scanner;
+import pieces.Piece;
+import utils.MoveValidator;
+import utils.Position;
 
 public class Game {
     private Board board;
@@ -33,6 +32,7 @@ public class Game {
 
                 if(input.length != 2){
                     System.out.println("Invalid input format: ");
+                    continue;
                 }
 
                 Position from = new Position(input[0]);

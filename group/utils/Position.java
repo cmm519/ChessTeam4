@@ -5,10 +5,19 @@ public class Position {
     private int col;
 
     public Position(String notation) {
-        this.col = notation.charAt(0) - 'A';
-        this.row = 8 - Character.getNumericValue(notation.charAt(1));
-    }//SEEMS TO ONLY WORK WITH CAPITAL LETTERS,
+        // Convert the notation to uppercase to handle both "b7" and "B7"
+        String upperNotation = notation.toUpperCase();
 
-    public int getRow() { return row; }
-    public int getCol() { return col; }
+        // Perform calculations on the uppercase string
+        this.col = upperNotation.charAt(0) - 'A';
+        this.row = 8 - Character.getNumericValue(upperNotation.charAt(1));
+    }
+
+    public int getRow() { 
+        return row; 
+    }
+
+    public int getCol() { 
+        return col; 
+    }
 }
