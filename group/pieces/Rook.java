@@ -14,7 +14,7 @@ public class Rook extends Piece {
 
         if (rowDiff != 0 && colDiff != 0) return false;
 
-        // Check path is clear
+        // Check path is clear... this is cool as heck 
         int stepRow = Integer.signum(rowDiff);
         int stepCol = Integer.signum(colDiff);
         int r = position.getRow() + stepRow;
