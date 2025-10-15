@@ -2,31 +2,44 @@ package pieces;
 
 import utils.Position;
 
+/**
+ * Represents a Knight piece in the game of chess.
+ */
 public class Knight extends Piece {
+
+    /**
+     * Constructs a Knight with a specified color and starting position.
+     * @param color The color of the piece ("white" or "black").
+     * @param position The starting position of the piece on the board.
+     */
     public Knight(String color, Position position) {
         super(color, position);
     }
 
+    /**
+     * Validates if a move to a new position is legal for a Rook.
+     * A Knight moves in an L-shaped pattern, only checking the occupancy of the target position.
+     * @param to The destination position for the move.
+     * @param board The current state of the game board.
+     * @return true if the move is valid, false otherwise.
+     */
     @Override
     public boolean isValidMove(Position to, Piece[][] board) {
-        int dir = color.equals("white") ? -1 : 1;
-        int startRow = color.equals("white") ? 6 : 1;
-
         int rowDiff = to.getRow() - position.getRow();
-        int colDiff = Math.abs(to.getCol() - position.getCol());
+        int colDiff = to.getCol() - position.getCol();
 
-        // Forward move
-        if (colDiff == 0) {
-            if (rowDiff == dir && board[to.getRow()][to.getCol()] == null) return true;
-            if (position.getRow() == startRow && rowDiff == 2 * dir && board[to.getRow()][to.getCol()] == null) return true;
-        }
+        // rowDiff or colDiff is positive/negative 1, while the other is positive/negative 2.
+        if(Math.abs(rowDiff + colDiff) != 1 && Math.abs(rowDiff + colDiff) != 3) return false;
 
-        // Diagonal capture
-        if (colDiff == 1 && rowDiff == dir && board[to.getRow()][to.getCol()] != null &&
-            !board[to.getRow()][to.getCol()].getColor().equals(color)) return true;
-
-        return false;
+        // Destination square must be empty or contain an opponent's piece.
+        return board[to.getRow()][to.getCol()] == null ||
+                !board[to.getRow()][to.getCol()].getColor().equals(color);
     }
+    
+    /**
+     * Gets the text symbol representing the Knight.
+     * @return "wN" for a white Knight, "bN" for a black Knight.
+     */
     @Override
     public String getSymbol(){
         return color.equals("white") ? "wN" :"bN";
