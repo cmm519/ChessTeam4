@@ -52,14 +52,23 @@ public abstract class Piece {
     public String getColor() {
         return color;
     }
-}
 
     /**
      * Gets the current position of the piece.
      *
      * @return The Position object representing the piece's location on the board.
-    //not used
+     */
     public Position getPosition() {
         return position;
     }
-         */
+
+     /**
+     * Gets the text symbol representing the Bishop.
+     * @return "wB" for a white Bishop, "bB" for a black Bishop.
+     */
+    
+    public String getSymbol() {
+        return color.equals("white") ? "wB" : "bB";
+    }
+}
+         

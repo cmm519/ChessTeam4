@@ -54,12 +54,5 @@ public class Bishop extends Piece {
         return destinationPiece == null || !destinationPiece.getColor().equals(this.color);
     }
 
-    /**
-     * Gets the text symbol representing the Bishop.
-     * @return "wB" for a white Bishop, "bB" for a black Bishop.
-     */
-    @Override
-    public String getSymbol() {
-        return color.equals("white") ? "wB" : "bB";
-    }
+   
 }
