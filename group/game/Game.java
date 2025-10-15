@@ -38,7 +38,7 @@ public class Game {
                     System.out.println("You are in check!");
                 }
 
-                System.out.print("Enter move (e.g., E2 E4): ");
+                System.out.print("Enter move: ");
                 String[] input = scanner.nextLine().toUpperCase().split(" ");
 
                 if (input.length != 2) {
