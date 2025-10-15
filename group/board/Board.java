@@ -134,4 +134,18 @@ public class Board {
         System.out.println("  ---------------------------------");
         System.out.println("    A   B   C   D   E   F   G   H\n");
     }
+    // 
+    /**
+    * Creates a deep copy of the current board state.
+    * @return A new Board object with the same piece layout.
+    */
+    public Board copy() {
+     Board newBoard = new Board();
+      for (int r = 0; r < 8; r++) {
+         for (int c = 0; c < 8; c++) {
+               newBoard.grid[r][c] = this.grid[r][c]; // this is a shallow copy of pieces
+            }
+        }
+    return newBoard;
+    }
 }

@@ -12,7 +12,10 @@ public class Position {
         this.col = upperNotation.charAt(0) - 'A';
         this.row = 8 - Character.getNumericValue(upperNotation.charAt(1));
     }
-
+public Position(int row, int col) {
+    this.row = row;
+    this.col = col;
+}
     public int getRow() { 
         return row; 
     }
