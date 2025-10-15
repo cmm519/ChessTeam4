@@ -1,0 +1,13 @@
+group/board/Board.java
+group/pieces/Knight.java
+group/pieces/Rook.java
+group/pieces/Bishop.java
+group/pieces/Queen.java
+group/pieces/King.java
+group/pieces/Piece.java
+group/pieces/Pawn.java
+group/utils/Position.java
+group/utils/MoveValidator.java
+group/game/Player.java
+group/game/Game.java
+group/game/Chess.java
