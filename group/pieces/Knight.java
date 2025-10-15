@@ -29,11 +29,15 @@ public class Knight extends Piece {
         int colDiff = to.getCol() - position.getCol();
 
         // rowDiff or colDiff is positive/negative 1, while the other is positive/negative 2.
-        if(Math.abs(rowDiff + colDiff) != 1 && Math.abs(rowDiff + colDiff) != 3) return false;
+        if((Math.abs(rowDiff) == 1 && Math.abs(colDiff) == 2) ||
+        (Math.abs(rowDiff) == 2 && Math.abs(colDiff) == 1)) {
+            // Destination square must be empty or contain an opponent's piece.
+            return board[to.getRow()][to.getCol()] == null ||
+                    !board[to.getRow()][to.getCol()].getColor().equals(color);
+        }
 
-        // Destination square must be empty or contain an opponent's piece.
-        return board[to.getRow()][to.getCol()] == null ||
-                !board[to.getRow()][to.getCol()].getColor().equals(color);
+        // Otherwise, the move is illegal.
+        return false;
     }
     
     /**
