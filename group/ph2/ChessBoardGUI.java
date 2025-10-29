@@ -102,7 +102,7 @@ public class ChessBoardGUI{
 		}
 	}
 
-	//public static void main(String[] argc){
-	//	SwingUtilities.invokeLater(ChessBoardGUI::new); 
-   // }
+	public static void main(String[] argc){
+		SwingUtilities.invokeLater(ChessBoardGUI::new); 
+    }
 }
