@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+
 public class ChessBoardGUI{
 	private static final int ROWS = 8;
 	private static final int COLS = 8;
@@ -10,7 +11,6 @@ public class ChessBoardGUI{
 	private JPanel selectedPanel = null;
 	private JLabel selectedLabel = null;
 
-	
 	//custom lighter colors for the board
 	Color lightColor = new Color(240,217,181);
 	Color darkColor = new Color(181,136,99);
@@ -41,8 +41,77 @@ public class ChessBoardGUI{
 		MouseAdapter boardListener = new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e){
-				JPanel clickPanel = (JPanel)e.getSource();
-				handleMouseClick(clickPanel);
+				System.out.println("Mouse clicked"); //for testing purpose
+				JPanel clickPanel = getPanelFromEvent(e);
+				if(clickPanel != null){
+					handleMouseClick(clickPanel);
+				}
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e){
+				JPanel panel = (JPanel)e.getSource();
+				if(panel != null && panel.getComponentCount() > 0){
+					selectedPanel = panel;
+					selectedLabel = (JLabel) panel.getComponent(0);
+					selectedPanel.setBorder(BorderFactory.createLineBorder(Color.GREEN,3));
+				}
+
+			}
+
+			@Override
+			public void mouseDragged(MouseEvent e){
+				JPanel panel = (JPanel)e.getSource();
+				if (panel != null){
+					panel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+				}
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e){
+				
+				if (selectedPanel != null && selectedLabel !=  null){
+					Component root = SwingUtilities.getRootPane(selectedPanel);
+					Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+					SwingUtilities.convertPointFromScreen(mousePoint, root);
+
+					Component dropTarget = SwingUtilities.getDeepestComponentAt(root,mousePoint.x,mousePoint.y);
+
+					if (dropTarget instanceof JLabel) {
+						dropTarget = ((JLabel) dropTarget).getParent();
+					}
+
+					if(dropTarget instanceof JPanel){
+						JPanel targetPanel = (JPanel) dropTarget;
+
+						selectedPanel.remove(selectedLabel);
+						selectedPanel.setBorder(null);
+
+						targetPanel.removeAll();
+						targetPanel.add(selectedLabel);
+
+						selectedPanel.revalidate();
+						selectedPanel.repaint();
+						targetPanel.revalidate();
+						targetPanel.repaint();
+
+						targetPanel.setCursor(Cursor.getDefaultCursor());
+
+						selectedPanel = null;
+						selectedLabel = null;
+
+					}
+				}
+			}
+			private JPanel getPanelFromEvent(MouseEvent e){
+				Component comp = e.getComponent();
+				if(comp instanceof JLabel){
+					return (JPanel) ((JLabel) comp).getParent();
+				}else if (comp instanceof JPanel) {
+					return (JPanel) comp;
+				}
+				return null;
 			}
 		};
 
@@ -55,6 +124,7 @@ public class ChessBoardGUI{
 
 				// add listener to each step
 				panel.addMouseListener(boardListener);
+				panel.addMouseMotionListener(boardListener);
 
 
 				String pieces = initBoard[i][j];
