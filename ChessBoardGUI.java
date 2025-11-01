@@ -1,8 +1,21 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
+import java.io.*;
 
+
+// define a serializable board state class
+class BoardState implements Serializable {
+    private String[][] board;
+
+    public BoardState(String[][] board) {
+        this.board = board;
+    }
+
+    public String[][] getBoard() {
+        return board;
+    }
+}
 
 public class ChessBoardGUI{
 	private static final int ROWS = 8;
@@ -28,11 +41,13 @@ public class ChessBoardGUI{
 	};
  
 
+	private MouseAdapter boardListener;
+
 	public ChessBoardGUI() {
 	
 		//create frame
 		JFrame frame = new JFrame("ChessBoard GUI");
-        frame.setSize(500,500);
+	        frame.setSize(500,500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridLayout(ROWS, COLS));
 
@@ -47,7 +62,7 @@ public class ChessBoardGUI{
 					handleMouseClick(clickPanel);
 				}
 			}
-
+			
 			@Override
 			public void mousePressed(MouseEvent e){
 				JPanel panel = (JPanel)e.getSource();
@@ -172,7 +187,106 @@ public class ChessBoardGUI{
 		}
 	}
 
-	public static void main(String[] argc){
-		SwingUtilities.invokeLater(ChessBoardGUI::new); 
+	// add savegame method and loadgame method
+	public void saveGameToFile(String filename) {
+		String[][] currentBoard = new String[ROWS][COLS];
+		for (int i = 0; i < ROWS; i++) {
+			for (int j = 0; j < COLS; j++) {
+				Component[] components = gameBoard[i][j].getComponents();
+				if (components.length > 0 && components[0] instanceof JLabel) {
+					currentBoard[i][j] = ((JLabel) components[0]).getText();
+				} else {
+					currentBoard[i][j] = "";
+				}
+			}
+		}
+
+		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+			out.writeObject(new BoardState(currentBoard));
+			System.out.println("Game saved successfully.");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void loadGameFromFile(String filename) {
+		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+			BoardState loadedState = (BoardState) in.readObject();
+			String[][] loadedBoard = loadedState.getBoard();
+
+			for (int i = 0; i < ROWS; i++) {
+				for (int j = 0; j < COLS; j++) {
+					gameBoard[i][j].removeAll();
+					String piece = loadedBoard[i][j];
+					if (!piece.isEmpty()) {
+						JLabel label = new JLabel(piece, SwingConstants.CENTER);
+						label.setFont(new Font("Serif", Font.BOLD, 32));
+						label.addMouseListener(boardListener);
+						label.addMouseMotionListener(boardListener);
+						gameBoard[i][j].add(label);
+					}
+					gameBoard[i][j].revalidate();
+					gameBoard[i][j].repaint();
+				}
+			}
+
+			System.out.println("Game loaded successfully.");
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+   // main function
+    public static void main(String[] args) {
+        //create frame
+        JFrame frame = new JFrame("Menu Bar");
+        frame.setSize(300,400);
+
+        //create a bar
+        JMenuBar menuBar = new JMenuBar();
+        //create menu files
+        JMenu files = new JMenu("File");
+        //create menu edit
+        JMenu edit = new JMenu("Edit");
+        // create new game,save game, and load game for files
+        JMenuItem newGame = new JMenuItem("New Game");
+        JMenuItem saveGame = new JMenuItem("Save Game");
+        JMenuItem loadGame = new JMenuItem("Load Game");
+        JMenuItem exitGame = new JMenuItem("Exit Game");
+        // add to the files
+        files.add(newGame);
+        files.add(saveGame);
+        files.add(loadGame);
+        files.add(exitGame);
+        //add to menuBar
+        menuBar.add(files);
+        menuBar.add(edit);
+        //set menubar to the frame
+        frame.setJMenuBar(menuBar);
+        frame.setVisible(true);
+
+
+        // create a single instance of the game
+        ChessBoardGUI[] gameInstance = new ChessBoardGUI[1];
+        
+        // new game
+		newGame.addActionListener(e -> {
+            gameInstance[0] = new ChessBoardGUI();
+        });
+		//save game
+        saveGame.addActionListener(e -> {
+            if (gameInstance[0] != null) {
+                gameInstance[0].saveGameToFile("chess_save.txt");
+            }   
+        });
+		//load game
+        loadGame.addActionListener(e ->{
+            if (gameInstance[0] != null){
+                gameInstance[0].loadGameFromFile("chess_save.txt");
+            }
+        });
+		//exit game
+        exitGame.addActionListener(e -> System.exit(0));
+            
     }
-}
+} 
