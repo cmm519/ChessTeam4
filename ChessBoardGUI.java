@@ -47,7 +47,7 @@ public class ChessBoardGUI{
 	
 		//create frame
 		JFrame frame = new JFrame("ChessBoard GUI");
-	        frame.setSize(500,500);
+	    frame.setSize(500,500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridLayout(ROWS, COLS));
 
@@ -231,11 +231,106 @@ public class ChessBoardGUI{
 			}
 
 			System.out.println("Game loaded successfully.");
-		} catch (IOException | ClassNotFoundException e) {
+		}
+		 catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+		
+		
 	}
 
+private void applySettings(String boardStyle, String pieceStyle, String boardSize){
+       
+        //update with boardstyle
+        switch(boardStyle) {
+            case "Classic Wooden":
+                lightColor = new Color(222,184,135);   // burlywood light wood
+                darkColor = new Color(139,69,19);  // saddlebrown dark wood         
+                break;
+            case "Modern Gray":
+                lightColor =  new Color(211,211,211); //lightGray
+                darkColor = new Color(105,105,105); // dimgray
+                break;
+            default:
+                lightColor = new Color(240,217,181);
+                darkColor = new Color(181,136,99);
+        }
+        //resize board
+        int newSize = switch (boardSize) {
+            case "Small" -> 400;
+            case "Medium" -> 600;
+            case "Large" -> 800;
+            default -> 500;
+        };
+
+        // update piece style
+        Font font = switch (pieceStyle) {
+            case "Colorful" -> new Font("Serif", Font.BOLD,32);
+            case "Minimalist" -> new Font ("SansSerif", Font.PLAIN, 28);
+            default -> new Font ("Serif", Font.PLAIN,32);
+        };
+
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
+                JPanel panel = new JPanel(new BorderLayout());
+                panel.setBackground((i + j) % 2 == 0 ? lightColor : darkColor);
+
+                if(panel.getComponentCount() > 0) {
+                    JLabel label = (JLabel) panel.getComponent(0);
+                    label.setFont(font);
+                    if(pieceStyle.equals("Colorful")) {
+                        label.setForeground(( i < 2 ) ? Color.BLACK : Color.WHITE);
+                    }else {
+                        label.setForeground(Color.BLACK);
+                    }
+                }
+            }       
+        }    
+
+        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(gameBoard[0][0]);
+        topFrame.setSize(newSize, newSize);
+        topFrame.revalidate();
+    }
+
+    class SettingsWindow extends JDialog {
+        public SettingsWindow(JFrame parent) {
+            super(parent, "Settings", true);
+            setLayout(new GridLayout(4, 2, 10, 10));
+
+            JComboBox<String> boardStyleCombo = new JComboBox<>(new String[] {
+                "Classic Wooden", "Modern Gray"
+            });
+            JComboBox<String> pieceStyleCombo = new JComboBox<>(new String[] {
+                "Minimalist", "Colorful"
+            });
+            JComboBox<String> boardSizeCombo = new JComboBox<>(new String[] {
+                "Small", "Medium", "Large"
+            });
+
+            JButton applyButton = new JButton("Apply");
+            applyButton.addActionListener(e -> {
+                String boardStyle = (String) boardStyleCombo.getSelectedItem();
+                String pieceStyle = (String) pieceStyleCombo.getSelectedItem();
+                String boardSize = (String) boardSizeCombo.getSelectedItem();
+                applySettings(boardStyle, pieceStyle, boardSize);
+                dispose();
+            });
+
+            add(new JLabel("Board Style:"));
+            add(boardStyleCombo);
+            add(new JLabel("Piece Style:"));
+            add(pieceStyleCombo);
+            add(new JLabel("Board Size:"));
+            add(boardSizeCombo);
+            add(new JLabel(""));
+            add(applyButton);
+
+            pack();
+            setLocationRelativeTo(parent);
+        }
+    }
+
+	
    // main function
     public static void main(String[] args) {
         //create frame
@@ -260,6 +355,23 @@ public class ChessBoardGUI{
         files.add(exitGame);
         //add to menuBar
         menuBar.add(files);
+
+
+
+        // create additional menu named option
+        JMenu option = new JMenu("Option");
+        JMenuItem settingItem = new JMenuItem("Setting");
+        ChessBoardGUI gui = new ChessBoardGUI();
+        settingItem.addActionListener(e -> gui.new SettingsWindow(frame).setVisible(true));
+        option.add(settingItem);
+        menuBar.add(option);
+
+		//set menubar to the frame
+        frame.setJMenuBar(menuBar);
+        frame.setVisible(true);
+
+        frame.setJMenuBar(menuBar);
+
         menuBar.add(edit);
         //set menubar to the frame
         frame.setJMenuBar(menuBar);
