@@ -1,7 +1,7 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import javax.swing.*;
 
 
 // define a serializable board state class
@@ -27,19 +27,29 @@ public class ChessBoardGUI{
 	//custom lighter colors for the board
 	Color lightColor = new Color(240,217,181);
 	Color darkColor = new Color(181,136,99);
- 
+static final String wP="\u2659"; //white pawn
+static final String bP="\u265F"; //black pawn			
+static final String bR="\u265C"; //black rook
+static final String wR="\u2656"; //white rook
+static final String bN="\u265E"; //white knight
+static final String wN="\u2658"; //black knight
+static final String bB="\u265D"; //white bishop
+static final String wB="\u2657"; //black bishop		
+static final String wQ="\u2655"; //white queen
+static final String bQ="\u265B"; //black queen
+static final String wK="\u2654"; //white king
+static final String bK="\u265A"; //black king
 	//unicode for the chess pieces
 	private static final String[][] initBoard = {
-		{"\u2656","\u2658","\u2657","\u2655","\u2654","\u2657","\u2658","\u2656"},
-		{"\u2659","\u2659","\u2659","\u2659","\u2659","\u2659","\u2659","\u2659"},
+		{bR,bN,bB,bQ,bK,bB,bN,bR},
+		{bP,bP,bP,bP,bP,bP,bP,bP},	
 		{"","","","","","","",""},
 		{"","","","","","","",""},
 		{"","","","","","","",""},
 		{"","","","","","","",""},
-		{"\u265F","\u265F","\u265F","\u265F","\u265F","\u265F","\u265F","\u265F"},		
-		{"\u265C","\u265E","\u265D","\u265B","\u265A","\u265D","\u265E","\u265C"}
+		{wP,wP,wP,wP,wP,wP,wP,wP},		
+		{wR,wN,wB,wK,wQ,wB,wN,wR}
 	};
- 
 
 	private MouseAdapter boardListener;
 
