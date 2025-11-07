@@ -23,8 +23,9 @@ public class ChessBoardGUI{
 	private final JPanel[][] gameBoard = new JPanel[ROWS][COLS];
 	private JPanel selectedPanel = null;
 	private JLabel selectedLabel = null;
+	public static boolean debug = false;//switch for sop's 
 
-	//custom lighter colors for the board
+	//custom lighter colors for the board// broken??
 	Color lightColor = new Color(240,217,181);
 	Color darkColor = new Color(181,136,99);
 static final String wP="\u2659"; //white pawn
@@ -39,7 +40,7 @@ static final String wQ="\u2655"; //white queen
 static final String bQ="\u265B"; //black queen
 static final String wK="\u2654"; //white king
 static final String bK="\u265A"; //black king
-	//unicode for the chess pieces
+	//unicode -> string variable  for the chess pieces to make ph 3 easier
 	private static final String[][] initBoard = {
 		{bR,bN,bB,bQ,bK,bB,bN,bR},
 		{bP,bP,bP,bP,bP,bP,bP,bP},	
@@ -50,11 +51,29 @@ static final String bK="\u265A"; //black king
 		{wP,wP,wP,wP,wP,wP,wP,wP},		
 		{wR,wN,wB,wK,wQ,wB,wN,wR}
 	};
+/**
+     * Displays a "Game Over" pop-up message.
+     * @param capturedKing The text of the king piece (wK or bK)
+     */
+    private void GameOver(String capturedKing) {//pass in which king was captured
+        // Determine the winner based on which king was captured
+        String winner = capturedKing.equals(wK) ? "Black" : "White";
+        String message = "Checkmate! " + winner + " wins!";
+
+        // Get the parent frame to center the dialog
+        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(gameBoard[0][0]);
+
+        // Show a simple "information" message dialog
+        JOptionPane.showMessageDialog(topFrame,
+                                      message,
+                                      "Game Over",
+                                      JOptionPane.INFORMATION_MESSAGE);
+            }
 
 	private MouseAdapter boardListener;
 
 	public ChessBoardGUI() {
-	
+
 		//create frame
 		JFrame frame = new JFrame("ChessBoard GUI");
 	    frame.setSize(500,500);
@@ -66,7 +85,9 @@ static final String bK="\u265A"; //black king
 		MouseAdapter boardListener = new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e){
+				if (ChessBoardGUI.debug) {
 				System.out.println("Mouse clicked"); //for testing purpose
+				}
 				JPanel clickPanel = getPanelFromEvent(e);
 				if(clickPanel != null){
 					handleMouseClick(clickPanel);
@@ -95,7 +116,9 @@ static final String bK="\u265A"; //black king
 
 			@Override
 			public void mouseReleased(MouseEvent e){
-				
+				if (ChessBoardGUI.debug) {
+					System.out.println(selectedLabel+""+ selectedPanel); //for testing purpose
+				}
 				if (selectedPanel != null && selectedLabel !=  null){
 					Component root = SwingUtilities.getRootPane(selectedPanel);
 					Point mousePoint = MouseInfo.getPointerInfo().getLocation();
@@ -106,13 +129,30 @@ static final String bK="\u265A"; //black king
 					if (dropTarget instanceof JLabel) {
 						dropTarget = ((JLabel) dropTarget).getParent();
 					}
-
+if (ChessBoardGUI.debug) {
+					System.out.println(dropTarget); //for testing purpose
+				}
 					if(dropTarget instanceof JPanel){
 						JPanel targetPanel = (JPanel) dropTarget;
 
 						selectedPanel.remove(selectedLabel);
 						selectedPanel.setBorder(null);
 
+						if (targetPanel.getComponentCount() > 0) {
+            Component capturedComponent = targetPanel.getComponent(0);
+            
+           
+            if (capturedComponent instanceof JLabel) {
+                JLabel capturedLabel = (JLabel) capturedComponent;
+                String capturedPiece = capturedLabel.getText();
+
+                // Check if the captured piece is a White King or Black King
+                if (capturedPiece.equals(wK) || capturedPiece.equals(bK)) {
+                    // If it is, show the "Game Over" dialog
+                    GameOver(capturedPiece);
+                }
+            }
+        }
 						targetPanel.removeAll();
 						targetPanel.add(selectedLabel);
 
@@ -172,13 +212,29 @@ static final String bK="\u265A"; //black king
 				selectedPanel = clickPanel;
 				selectedLabel = (JLabel) selectedPanel.getComponent(0);
 				//highlight selection
+						System.out.println("lines 175 passed"); //for testing purpose
+System.out.println(selectedPanel); //for testing purpose
+
 				selectedPanel.setBorder(BorderFactory.createLineBorder(Color.GREEN,3)); 
 			}
 		}else{
 				selectedPanel.remove(selectedLabel);
 				selectedPanel.setBorder(null);
 
-				
+				if (targetPanel.getComponentCount() > 0) {
+            Component capturedComponent = targetPanel.getComponent(0);
+            
+            if (capturedComponent instanceof JLabel) {
+                JLabel capturedLabel = (JLabel) capturedComponent;
+                String capturedPiece = capturedLabel.getText();
+
+                // Check if the captured piece is a White King or Black King
+                if (capturedPiece.equals(wK) || capturedPiece.equals(bK)) {
+                    // If it is, show the "Game Over" dialog
+                    GameOver(capturedPiece);
+                }
+            }
+        }
         		// Remove any piece in the destination panel
         		clickPanel.removeAll();
 
@@ -197,7 +253,8 @@ static final String bK="\u265A"; //black king
 		}
 	}
 
-	// add savegame method and loadgame method
+	// add savegame method and loadgame met
+	
 	public void saveGameToFile(String filename) {
 		String[][] currentBoard = new String[ROWS][COLS];
 		for (int i = 0; i < ROWS; i++) {
@@ -289,7 +346,7 @@ private void applySettings(String boardStyle, String pieceStyle, String boardSiz
                     JLabel label = (JLabel) panel.getComponent(0);
                     label.setFont(font);
                     if(pieceStyle.equals("Colorful")) {
-                        label.setForeground(( i < 2 ) ? Color.BLACK : Color.WHITE);
+                        label.setForeground(( i < 2 ) ? Color.PINK : Color.BLUE);
                     }else {
                         label.setForeground(Color.BLACK);
                     }
@@ -328,7 +385,7 @@ private void applySettings(String boardStyle, String pieceStyle, String boardSiz
 
             add(new JLabel("Board Style:"));
             add(boardStyleCombo);
-            add(new JLabel("Piece Style:"));
+            add(new JLabel("Piece Style:"));//not implemented 
             add(pieceStyleCombo);
             add(new JLabel("Board Size:"));
             add(boardSizeCombo);
@@ -352,7 +409,7 @@ private void applySettings(String boardStyle, String pieceStyle, String boardSiz
         //create menu files
         JMenu files = new JMenu("File");
         //create menu edit
-        JMenu edit = new JMenu("Edit");
+        JMenu edit = new JMenu("debug");//will use to turn on global debug sop's
         // create new game,save game, and load game for files
         JMenuItem newGame = new JMenuItem("New Game");
         JMenuItem saveGame = new JMenuItem("Save Game");
@@ -370,6 +427,7 @@ private void applySettings(String boardStyle, String pieceStyle, String boardSiz
 
         // create additional menu named option
         JMenu option = new JMenu("Option");
+		//JMenuItem debugItem = new JMenuItem("Debug");
         JMenuItem settingItem = new JMenuItem("Setting");
         ChessBoardGUI gui = new ChessBoardGUI();
         settingItem.addActionListener(e -> gui.new SettingsWindow(frame).setVisible(true));
@@ -384,9 +442,13 @@ private void applySettings(String boardStyle, String pieceStyle, String boardSiz
 
         menuBar.add(edit);
         //set menubar to the frame
+		JMenuItem debugItem = new JMenuItem("Debug");
         frame.setJMenuBar(menuBar);
         frame.setVisible(true);
-
+debugItem.addActionListener(e -> {
+            // This toggles the boolean variable
+            ChessBoardGUI.debug = !ChessBoardGUI.debug;
+        });
 
         // create a single instance of the game
         ChessBoardGUI[] gameInstance = new ChessBoardGUI[1];
