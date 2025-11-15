@@ -9,8 +9,8 @@ This project is a GUI-based Chess game developed as part of TXST Object-Oriented
 # Team Name: ChessTeam4
 
 ## Team Members:
-  Corbin 
-  Josh
+  Corbin, 
+  Josh,
   En
   
 ###Preview:
@@ -29,13 +29,13 @@ Follow these instructions to compile and run the project:
      java......
 
 ###Features checklist
-  GUI with an 8*8 ChessBoard
-  Piece Movement with Mouse Interaction
-  Move Validation Based on Chess rule
-  Capture Mechanism
-  Check and Checkmate Detection
-  Turn-Based Play for Two Players
-  Game End Notification on Checkmate
+ [] GUI with an 8*8 ChessBoard
+ [] Piece Movement with Mouse Interaction
+ [] Move Validation Based on Chess rule
+ [] Capture Mechanism
+ [] Check and Checkmate Detection
+ [] Turn-Based Play for Two Players
+ [] Game End Notification on Checkmate
 
 Note: Check each box as your inplement these features.
 
