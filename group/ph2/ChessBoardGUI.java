@@ -5,7 +5,7 @@ import javax.swing.*;
 
 
 // define a serializable board state class
-class BoardState implements Serializable {
+class BoardState implements Serializable {//what on earth is serializable?? Will have to learn later 
     private String[][] board;
 
     public BoardState(String[][] board) {
