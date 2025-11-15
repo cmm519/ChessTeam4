@@ -1,8 +1,9 @@
-package game;
+package PH1.game;
 
-import board.Board;
 import java.util.Scanner;
-import pieces.Piece;
+
+import PH1.board.Board;
+import PH1.pieces.Piece;
 import utils.MoveValidator;
 import utils.Position;
 

@@ -1,4 +1,4 @@
-package game;
+package PH1.game;
 
 /**
 * The main class for the Chess game. This class initializes and starts the game.

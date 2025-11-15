@@ -1,4 +1,4 @@
-package game;
+package PH1.game;
 
 public class Player {
     private String color;

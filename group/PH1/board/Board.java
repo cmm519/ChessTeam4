@@ -1,6 +1,6 @@
-package board;
+package PH1.board;
 
-import pieces.*;
+import PH1.pieces.*;
 import utils.Position;
 
 /**
