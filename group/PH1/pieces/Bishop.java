@@ -1,6 +1,6 @@
 package PH1.pieces;
 
-import utils.Position;
+import PH1.utils.Position;
 
 /**
  * Represents a Bishop piece in the game of chess.

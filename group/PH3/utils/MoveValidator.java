@@ -1,8 +1,8 @@
 package utils;
 
-import PH1.board.Board;
-import PH1.pieces.King;
-import PH1.pieces.Piece;
+import board.Board;
+import pieces.King;
+import pieces.Piece;
 
 public class MoveValidator {
 

@@ -1,6 +1,6 @@
 package PH1.pieces;
 
-import utils.Position;
+import PH1.utils.Position;
 
 /**
  * Represents the abstract concept of a chess piece.

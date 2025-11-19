@@ -1,8 +1,9 @@
-package utils;
+package PH1.utils;
 
 import board.Board;
 import pieces.King;
 import pieces.Piece;
+import utils.Position;
 
 public class MoveValidator {
 

@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
+import utils.MoveValidator;
 
 
 // define a serializable board state class

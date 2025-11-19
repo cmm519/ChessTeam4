@@ -1,6 +1,6 @@
 package PH1.pieces;
 
-import utils.Position;
+import PH1.utils.Position;
 
 public class King extends Piece {
     public King (String color, Position position) {

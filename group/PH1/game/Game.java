@@ -4,8 +4,8 @@ import java.util.Scanner;
 
 import PH1.board.Board;
 import PH1.pieces.Piece;
-import utils.MoveValidator;
-import utils.Position;
+import PH1.utils.MoveValidator;
+import PH1.utils.Position;
 
 public class Game {
     private Board board;

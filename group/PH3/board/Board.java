@@ -1,7 +1,7 @@
-package PH1.board;
+package board;
 
-import PH1.pieces.*;
-import PH1.utils.Position;
+import pieces.*;
+import utils.Position;
 
 /**
  * <p>Represents the chess board and manages its state.
