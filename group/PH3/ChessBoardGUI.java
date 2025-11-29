@@ -1,12 +1,14 @@
+import board.Board;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
+import pieces.Piece;
 import utils.MoveValidator;
-
+import utils.Position;
 
 // define a serializable board state class
-class BoardState implements Serializable {//what on earth is serializable?? Will have to learn later 
+class BoardState implements Serializable {
     private String[][] board;
 
     public BoardState(String[][] board) {
@@ -18,312 +20,338 @@ class BoardState implements Serializable {//what on earth is serializable?? Will
     }
 }
 
-public class ChessBoardGUI{
-	private static final int ROWS = 8;
-	private static final int COLS = 8;
-	private final JPanel[][] gameBoard = new JPanel[ROWS][COLS];
-	private JPanel selectedPanel = null;
-	private JLabel selectedLabel = null;
-	public static boolean debug = false;//switch for sop's 
+public class ChessBoardGUI {
+    private static final int ROWS = 8;
+    private static final int COLS = 8;
+    private final JPanel[][] gameBoard = new JPanel[ROWS][COLS];
+    private JPanel selectedPanel = null;
+    private JLabel selectedLabel = null;
+    public static boolean debug = false;
 
-	//custom lighter colors for the board// broken??
-	Color lightColor = new Color(240,217,181);
-	Color darkColor = new Color(181,136,99);
-static final String wP="\u2659"; //white pawn
-static final String bP="\u265F"; //black pawn			
-static final String bR="\u265C"; //black rook
-static final String wR="\u2656"; //white rook
-static final String bN="\u265E"; //white knight
-static final String wN="\u2658"; //black knight
-static final String bB="\u265D"; //white bishop
-static final String wB="\u2657"; //black bishop		
-static final String wQ="\u2655"; //white queen
-static final String bQ="\u265B"; //black queen
-static final String wK="\u2654"; //white king
-static final String bK="\u265A"; //black king
-	//unicode -> string variable  for the chess pieces to make ph 3 easier
-	private static final String[][] initBoard = {
-		{bR,bN,bB,bQ,bK,bB,bN,bR},
-		{bP,bP,bP,bP,bP,bP,bP,bP},	
-		{"","","","","","","",""},
-		{"","","","","","","",""},
-		{"","","","","","","",""},
-		{"","","","","","","",""},
-		{wP,wP,wP,wP,wP,wP,wP,wP},		
-		{wR,wN,wB,wK,wQ,wB,wN,wR}
-	};
-/**
-     * Displays a "Game Over" pop-up message.
-     * @param capturedKing The text of the king piece (wK or bK)
-     */
-    private void GameOver(String capturedKing) {//pass in which king was captured
-        // Determine the winner based on which king was captured
-        String winner = capturedKing.equals(wK) ? "Black" : "White";
+    // The logical board that handles rules and piece positions
+    private Board boardLogic;
+    private String currentPlayer = "white"; // Track whose turn it is
+
+    Color lightColor = new Color(240, 217, 181);
+    Color darkColor = new Color(181, 136, 99);
+    static final String wP = "\u2659";
+    static final String bP = "\u265F";
+    static final String bR = "\u265C";
+    static final String wR = "\u2656";
+    static final String bN = "\u265E";
+    static final String wN = "\u2658";
+    static final String bB = "\u265D";
+    static final String wB = "\u2657";
+    static final String wQ = "\u2655";
+    static final String bQ = "\u265B";
+    static final String wK = "\u2654";
+    static final String bK = "\u265A";
+
+    private static final String[][] initBoard = {
+        {bR, bN, bB, bQ, bK, bB, bN, bR},
+        {bP, bP, bP, bP, bP, bP, bP, bP},
+        {"", "", "", "", "", "", "", ""},
+        {"", "", "", "", "", "", "", ""},
+        {"", "", "", "", "", "", "", ""},
+        {"", "", "", "", "", "", "", ""},
+        {wP, wP, wP, wP, wP, wP, wP, wP},
+        {wR, wN, wB, wK, wQ, wB, wN, wR}
+    };
+
+    private void GameOver(String winner) {
         String message = "Checkmate! " + winner + " wins!";
-
-        // Get the parent frame to center the dialog
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(gameBoard[0][0]);
+        JOptionPane.showMessageDialog(topFrame, message, "Game Over", JOptionPane.INFORMATION_MESSAGE);
+    }
 
-        // Show a simple "information" message dialog
-        JOptionPane.showMessageDialog(topFrame,
-                                      message,
-                                      "Game Over",
-                                      JOptionPane.INFORMATION_MESSAGE);
+    public ChessBoardGUI() {
+        boardLogic = new Board();
+
+        JFrame frame = new JFrame("ChessBoard GUI");
+        frame.setSize(500, 500);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new GridLayout(ROWS, COLS));
+
+        MouseAdapter boardListener = new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JPanel clickPanel = getPanelFromEvent(e);
+                if (clickPanel != null) {
+                    handleMouseClick(clickPanel);
+                }
             }
 
-	private MouseAdapter boardListener;
+            @Override
+            public void mousePressed(MouseEvent e) {
+                JPanel panel = (JPanel) e.getSource();
+                if (panel != null && panel.getComponentCount() > 0) {
+                    // Only allow selecting pieces of the current player
+                    Point coords = getGridCoordinates(panel);
+                    Piece p = boardLogic.getPiece(new Position(coords.x, coords.y));
+                    if (p != null && p.getColor().equalsIgnoreCase(currentPlayer)) {
+                        selectedPanel = panel;
+                        selectedLabel = (JLabel) panel.getComponent(0);
+                        selectedPanel.setBorder(BorderFactory.createLineBorder(Color.GREEN, 3));
+                    }
+                }
+            }
 
-	public ChessBoardGUI() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                JPanel panel = (JPanel) e.getSource();
+                if (panel != null) {
+                    panel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                }
+            }
 
-		//create frame
-		JFrame frame = new JFrame("ChessBoard GUI");
-	    frame.setSize(500,500);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new GridLayout(ROWS, COLS));
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (selectedPanel != null && selectedLabel != null) {
+                    Component root = SwingUtilities.getRootPane(selectedPanel);
+                    Point mousePoint = MouseInfo.getPointerInfo().getLocation();
+                    SwingUtilities.convertPointFromScreen(mousePoint, root);
 
+                    Component dropTarget = SwingUtilities.getDeepestComponentAt(root, mousePoint.x, mousePoint.y);
+                    if (dropTarget instanceof JLabel) {
+                        dropTarget = ((JLabel) dropTarget).getParent();
+                    }
 
-		// create a MouseAdapter instance to handle all clicks
-		MouseAdapter boardListener = new MouseAdapter(){
-			@Override
-			public void mouseClicked(MouseEvent e){
-				if (ChessBoardGUI.debug) {
-				System.out.println("Mouse clicked"); //for testing purpose
-				}
-				JPanel clickPanel = getPanelFromEvent(e);
-				if(clickPanel != null){
-					handleMouseClick(clickPanel);
-				}
-			}
-			
-			@Override
-			public void mousePressed(MouseEvent e){
-				JPanel panel = (JPanel)e.getSource();
-				if(panel != null && panel.getComponentCount() > 0){
-					selectedPanel = panel;
-					selectedLabel = (JLabel) panel.getComponent(0);
-					selectedPanel.setBorder(BorderFactory.createLineBorder(Color.GREEN,3));
-				}
+                    if (dropTarget instanceof JPanel) {
+                        JPanel targetPanel = (JPanel) dropTarget;
+                        Point fromCoords = getGridCoordinates(selectedPanel);
+                        Point toCoords = getGridCoordinates(targetPanel);
 
-			}
+                        if (!isMoveValid(fromCoords, toCoords)) {
+                            // Invalid move: Snap back
+                            selectedPanel.setBorder(null);
+                            selectedPanel = null;
+                            selectedLabel = null;
+                            return;
+                        }
 
-			@Override
-			public void mouseDragged(MouseEvent e){
-				JPanel panel = (JPanel)e.getSource();
-				if (panel != null){
-					panel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-				}
-				
-			}
+                        // Execute Move Logic
+                        executeMove(fromCoords, toCoords, targetPanel);
+                    } else {
+                        // Released outside board
+                        selectedPanel.setBorder(null);
+                        selectedPanel = null;
+                        selectedLabel = null;
+                    }
+                }
+            }
 
-			@Override
-			public void mouseReleased(MouseEvent e){
-				if (ChessBoardGUI.debug) {
-					System.out.println(selectedLabel+""+ selectedPanel); //for testing purpose
-				}
-				if (selectedPanel != null && selectedLabel !=  null){
-					Component root = SwingUtilities.getRootPane(selectedPanel);
-					Point mousePoint = MouseInfo.getPointerInfo().getLocation();
-					SwingUtilities.convertPointFromScreen(mousePoint, root);
+            private JPanel getPanelFromEvent(MouseEvent e) {
+                Component comp = e.getComponent();
+                if (comp instanceof JLabel) {
+                    return (JPanel) ((JLabel) comp).getParent();
+                } else if (comp instanceof JPanel) {
+                    return (JPanel) comp;
+                }
+                return null;
+            }
+        };
 
-					Component dropTarget = SwingUtilities.getDeepestComponentAt(root,mousePoint.x,mousePoint.y);
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
+                JPanel panel = new JPanel(new BorderLayout());
+                panel.setBackground((i + j) % 2 == 0 ? lightColor : darkColor);
+                panel.addMouseListener(boardListener);
+                panel.addMouseMotionListener(boardListener);
 
-					if (dropTarget instanceof JLabel) {
-						dropTarget = ((JLabel) dropTarget).getParent();
-					}
-if (ChessBoardGUI.debug) {
-					System.out.println(dropTarget); //for testing purpose
-				}
-					if(dropTarget instanceof JPanel){
-						JPanel targetPanel = (JPanel) dropTarget;
+                String pieces = initBoard[i][j];
+                if (!pieces.isEmpty()) {
+                    JLabel label = new JLabel(pieces, SwingConstants.CENTER);
+                    label.setFont(new Font("Serif", Font.BOLD, 32));
+                    panel.add(label);
+                }
+                frame.add(panel);
+                gameBoard[i][j] = panel;
+            }
+        }
+        frame.setVisible(true);
+    }
 
-						selectedPanel.remove(selectedLabel);
-						selectedPanel.setBorder(null);
-
-						if (targetPanel.getComponentCount() > 0) {
-            Component capturedComponent = targetPanel.getComponent(0);
-            
-           
-            if (capturedComponent instanceof JLabel) {
-                JLabel capturedLabel = (JLabel) capturedComponent;
-                String capturedPiece = capturedLabel.getText();
-
-                // Check if the captured piece is a White King or Black King
-                if (capturedPiece.equals(wK) || capturedPiece.equals(bK)) {
-                    // If it is, show the "Game Over" dialog
-                    GameOver(capturedPiece);
+    private Point getGridCoordinates(JPanel panel) {
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
+                if (gameBoard[r][c] == panel) {
+                    return new Point(r, c);
                 }
             }
         }
-						targetPanel.removeAll();
-						targetPanel.add(selectedLabel);
+        return new Point(-1, -1);
+    }
 
-						selectedPanel.revalidate();
-						selectedPanel.repaint();
-						targetPanel.revalidate();
-						targetPanel.repaint();
+    /** GPT added 185 - 286
+     * Validates a move using Board logic and MoveValidator.
+     */
+    private boolean isMoveValid(Point from, Point to) {
+        Position fromPos = new Position(from.x, from.y);
+        Position toPos = new Position(to.x, to.y);
 
-						targetPanel.setCursor(Cursor.getDefaultCursor());
+        Piece p = boardLogic.getPiece(fromPos);
+        if (p == null) return false;
 
-						selectedPanel = null;
-						selectedLabel = null;
+        // 1. Check Turn
+        if (!p.getColor().equalsIgnoreCase(currentPlayer)) {
+            if (debug) System.out.println("Not your turn!");
+            return false;
+        }
 
-					}
-				}
-			}
-			private JPanel getPanelFromEvent(MouseEvent e){
-				Component comp = e.getComponent();
-				if(comp instanceof JLabel){
-					return (JPanel) ((JLabel) comp).getParent();
-				}else if (comp instanceof JPanel) {
-					return (JPanel) comp;
-				}
-				return null;
-			}
-		};
+        // 2. Check Piece Rules (Can this piece physically move there?)
+        if (!p.isValidMove(toPos, boardLogic.getGrid())) {
+             if (debug) System.out.println("Invalid piece movement.");
+            return false;
+        }
 
+        // 3. Check King Safety (Does this move leave/put King in check?)
+        // We must simulate the move on a copy of the board
+        Board tempBoard = boardLogic.copy();
+        tempBoard.movePiece(fromPos, toPos);
 
+        if (MoveValidator.isKingInCheck(currentPlayer, tempBoard.getGrid())) {
+            if (debug) System.out.println("Move leaves king in check!");
+            return false;
+        }
 
-		for (int i = 0; i < ROWS; i++){
-			for (int j = 0; j < COLS; j++) {
-				JPanel panel = new JPanel(new BorderLayout());
-				panel.setBackground((i+j) % 2 == 0 ? lightColor : darkColor);
+        return true;
+    }
 
-				// add listener to each step
-				panel.addMouseListener(boardListener);
-				panel.addMouseMotionListener(boardListener);
+    /**
+     * Executes the move on both the Logical Board and the GUI.
+     */
+    private void executeMove(Point fromCoords, Point toCoords, JPanel targetPanel) {
+        // Update Logic
+        Position fromPos = new Position(fromCoords.x, fromCoords.y);
+        Position toPos = new Position(toCoords.x, toCoords.y);
+        boardLogic.movePiece(fromPos, toPos);
 
+        // Update GUI
+        selectedPanel.remove(selectedLabel);
+        selectedPanel.setBorder(null);
+        targetPanel.removeAll(); // Removes captured piece if any
+        targetPanel.add(selectedLabel);
 
-				String pieces = initBoard[i][j];
-				if(!pieces.isEmpty()){
-					JLabel label = new JLabel(pieces,SwingConstants.CENTER);
-					label.setFont(new Font("Serif",Font.BOLD,32));
-					panel.add(label);
-				}
-				frame.add(panel);
-				gameBoard[i][j] = panel;	
-			}
-		}
-		frame.setVisible(true);
+        selectedPanel.revalidate();
+        selectedPanel.repaint();
+        targetPanel.revalidate();
+        targetPanel.repaint();
+        targetPanel.setCursor(Cursor.getDefaultCursor());
 
-	}
+        selectedPanel = null;
+        selectedLabel = null;
 
-	private void handleMouseClick(JPanel clickPanel){
-		if(selectedPanel == null){
-			if(clickPanel.getComponentCount() > 0){
-				selectedPanel = clickPanel;
-				selectedLabel = (JLabel) selectedPanel.getComponent(0);
-				//highlight selection
-						System.out.println("lines 175 passed"); //for testing purpose
-System.out.println(selectedPanel); //for testing purpose
+        // Switch Turn
+        currentPlayer = currentPlayer.equals("white") ? "black" : "white";
+        System.out.println("Turn: " + currentPlayer);
 
-				selectedPanel.setBorder(BorderFactory.createLineBorder(Color.GREEN,3)); 
-			}
-		}else{
-				selectedPanel.remove(selectedLabel);
-				selectedPanel.setBorder(null);
+        // Check Game State (Checkmate/Stalemate)
+        if (MoveValidator.isCheckmate(currentPlayer, boardLogic)) {
+            GameOver(currentPlayer.equals("white") ? "Black" : "White");
+        } else if (MoveValidator.isKingInCheck(currentPlayer, boardLogic.getGrid())) {
+            System.out.println("Check!");
+        }
+    }
 
-				if (targetPanel.getComponentCount() > 0) {
-            Component capturedComponent = targetPanel.getComponent(0);
-            
-            if (capturedComponent instanceof JLabel) {
-                JLabel capturedLabel = (JLabel) capturedComponent;
-                String capturedPiece = capturedLabel.getText();
+    private void handleMouseClick(JPanel clickPanel) {
+        if (selectedPanel == null) {
+            if (clickPanel.getComponentCount() > 0) {
+                // Only select if it matches current player
+                Point coords = getGridCoordinates(clickPanel);
+                Piece p = boardLogic.getPiece(new Position(coords.x, coords.y));
+                
+                if (p != null && p.getColor().equalsIgnoreCase(currentPlayer)) {
+                    selectedPanel = clickPanel;
+                    selectedLabel = (JLabel) selectedPanel.getComponent(0);
+                    selectedPanel.setBorder(BorderFactory.createLineBorder(Color.GREEN, 3));
+                }
+            }
+        } else {
+            // Move Attempt
+            JPanel targetPanel = clickPanel;
+            Point fromCoords = getGridCoordinates(selectedPanel);
+            Point toCoords = getGridCoordinates(targetPanel);
 
-                // Check if the captured piece is a White King or Black King
-                if (capturedPiece.equals(wK) || capturedPiece.equals(bK)) {
-                    // If it is, show the "Game Over" dialog
-                    GameOver(capturedPiece);
+            if (!isMoveValid(fromCoords, toCoords)) {
+                // Invalid move: deselect
+                selectedPanel.setBorder(null);
+                selectedPanel = null;
+                selectedLabel = null;
+                return;
+            }
+
+            // Valid move: Execute
+            executeMove(fromCoords, toCoords, targetPanel);
+        }
+    }
+
+    public void saveGameToFile(String filename) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+            // Note: For a real save, you should serialize 'boardLogic' and 'currentPlayer'
+            // Saving just the visual board strings loses game state (like castling rights).
+            out.writeObject(new BoardState(getVisualBoardState())); 
+            System.out.println("Game saved successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String[][] getVisualBoardState() {
+        String[][] currentBoard = new String[ROWS][COLS];
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
+                Component[] components = gameBoard[i][j].getComponents();
+                if (components.length > 0 && components[0] instanceof JLabel) {
+                    currentBoard[i][j] = ((JLabel) components[0]).getText();
+                } else {
+                    currentBoard[i][j] = "";
                 }
             }
         }
-        		// Remove any piece in the destination panel
-        		clickPanel.removeAll();
+        return currentBoard;
+    }
 
-        		// Add the selected piece to the destination
-       	 		clickPanel.add(selectedLabel);
+    public void loadGameFromFile(String filename) {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+            BoardState loadedState = (BoardState) in.readObject();
+            String[][] loadedBoard = loadedState.getBoard();
 
-				// Refresh both panels
-				selectedPanel.revalidate();
-				selectedPanel.repaint();
-				clickPanel.revalidate();
-				clickPanel.repaint();
+            for (int i = 0; i < ROWS; i++) {
+                for (int j = 0; j < COLS; j++) {
+                    gameBoard[i][j].removeAll();
+                    String piece = loadedBoard[i][j];
+                    if (!piece.isEmpty()) {
+                        JLabel label = new JLabel(piece, SwingConstants.CENTER);
+                        label.setFont(new Font("Serif", Font.BOLD, 32));
+                        gameBoard[i][j].add(label);
+                    }
+                    gameBoard[i][j].revalidate();
+                    gameBoard[i][j].repaint();
+                }
+            }
+            // WARNING: Loading visual state does not update boardLogic!
+            // You should add logic to reconstruct boardLogic from the loaded strings. This is still broken have yet to update it.
+            System.out.println("Game loaded successfully.");
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
-				// Clear selection
-				selectedPanel = null;
-				selectedLabel = null;
-		}
-	}
-
-	// add savegame method and loadgame met
-	
-	public void saveGameToFile(String filename) {
-		String[][] currentBoard = new String[ROWS][COLS];
-		for (int i = 0; i < ROWS; i++) {
-			for (int j = 0; j < COLS; j++) {
-				Component[] components = gameBoard[i][j].getComponents();
-				if (components.length > 0 && components[0] instanceof JLabel) {
-					currentBoard[i][j] = ((JLabel) components[0]).getText();
-				} else {
-					currentBoard[i][j] = "";
-				}
-			}
-		}
-
-		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
-			out.writeObject(new BoardState(currentBoard));
-			System.out.println("Game saved successfully.");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void loadGameFromFile(String filename) {
-		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
-			BoardState loadedState = (BoardState) in.readObject();
-			String[][] loadedBoard = loadedState.getBoard();
-
-			for (int i = 0; i < ROWS; i++) {
-				for (int j = 0; j < COLS; j++) {
-					gameBoard[i][j].removeAll();
-					String piece = loadedBoard[i][j];
-					if (!piece.isEmpty()) {
-						JLabel label = new JLabel(piece, SwingConstants.CENTER);
-						label.setFont(new Font("Serif", Font.BOLD, 32));
-						label.addMouseListener(boardListener);
-						label.addMouseMotionListener(boardListener);
-						gameBoard[i][j].add(label);
-					}
-					gameBoard[i][j].revalidate();
-					gameBoard[i][j].repaint();
-				}
-			}
-
-			System.out.println("Game loaded successfully.");
-		}
-		 catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		
-	}
-
-private void applySettings(String boardStyle, String pieceStyle, String boardSize){
-       
-        //update with boardstyle
-        switch(boardStyle) {
+    private void applySettings(String boardStyle, String pieceStyle, String boardSize) {
+        switch (boardStyle) {
             case "Classic Wooden":
-                lightColor = new Color(222,184,135);   // burlywood light wood
-                darkColor = new Color(139,69,19);  // saddlebrown dark wood         
+                lightColor = new Color(222, 184, 135);
+                darkColor = new Color(139, 69, 19);
                 break;
             case "Modern Gray":
-                lightColor =  new Color(211,211,211); //lightGray
-                darkColor = new Color(105,105,105); // dimgray
+                lightColor = new Color(211, 211, 211);
+                darkColor = new Color(105, 105, 105);
                 break;
             default:
-                lightColor = new Color(240,217,181);
-                darkColor = new Color(181,136,99);
+                lightColor = new Color(240, 217, 181);
+                darkColor = new Color(181, 136, 99);
         }
-        //resize board
+        
         int newSize = switch (boardSize) {
             case "Small" -> 400;
             case "Medium" -> 600;
@@ -331,33 +359,33 @@ private void applySettings(String boardStyle, String pieceStyle, String boardSiz
             default -> 500;
         };
 
-        // update piece style
         Font font = switch (pieceStyle) {
-            case "Colorful" -> new Font("Serif", Font.BOLD,32);
-            case "Minimalist" -> new Font ("SansSerif", Font.PLAIN, 28);
-            default -> new Font ("Serif", Font.PLAIN,32);
+            case "Colorful" -> new Font("Serif", Font.BOLD, 32);
+            case "Minimalist" -> new Font("SansSerif", Font.PLAIN, 28);
+            default -> new Font("Serif", Font.PLAIN, 32);
         };
 
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
-                JPanel panel = new JPanel(new BorderLayout());
+                JPanel panel = gameBoard[i][j];
                 panel.setBackground((i + j) % 2 == 0 ? lightColor : darkColor);
-
-                if(panel.getComponentCount() > 0) {
+                if (panel.getComponentCount() > 0) {
                     JLabel label = (JLabel) panel.getComponent(0);
                     label.setFont(font);
-                    if(pieceStyle.equals("Colorful")) {
-                        label.setForeground(( i < 2 ) ? Color.PINK : Color.BLUE);
-                    }else {
+                    if (pieceStyle.equals("Colorful")) {
+                        label.setForeground((i < 2) ? Color.PINK : Color.BLUE);
+                    } else {
                         label.setForeground(Color.BLACK);
                     }
                 }
-            }       
-        }    
+            }
+        }
 
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(gameBoard[0][0]);
-        topFrame.setSize(newSize, newSize);
-        topFrame.revalidate();
+        if (topFrame != null) {
+            topFrame.setSize(newSize, newSize);
+            topFrame.revalidate();
+        }
     }
 
     class SettingsWindow extends JDialog {
@@ -365,113 +393,72 @@ private void applySettings(String boardStyle, String pieceStyle, String boardSiz
             super(parent, "Settings", true);
             setLayout(new GridLayout(4, 2, 10, 10));
 
-            JComboBox<String> boardStyleCombo = new JComboBox<>(new String[] {
-                "Classic Wooden", "Modern Gray"
-            });
-            JComboBox<String> pieceStyleCombo = new JComboBox<>(new String[] {
-                "Minimalist", "Colorful"
-            });
-            JComboBox<String> boardSizeCombo = new JComboBox<>(new String[] {
-                "Small", "Medium", "Large"
-            });
-
+            JComboBox<String> boardStyleCombo = new JComboBox<>(new String[]{"Classic Wooden", "Modern Gray"});
+            JComboBox<String> pieceStyleCombo = new JComboBox<>(new String[]{"Minimalist", "Colorful"});
+            JComboBox<String> boardSizeCombo = new JComboBox<>(new String[]{"Small", "Medium", "Large"});
             JButton applyButton = new JButton("Apply");
+            
             applyButton.addActionListener(e -> {
-                String boardStyle = (String) boardStyleCombo.getSelectedItem();
-                String pieceStyle = (String) pieceStyleCombo.getSelectedItem();
-                String boardSize = (String) boardSizeCombo.getSelectedItem();
-                applySettings(boardStyle, pieceStyle, boardSize);
+                applySettings((String) boardStyleCombo.getSelectedItem(),
+                              (String) pieceStyleCombo.getSelectedItem(),
+                              (String) boardSizeCombo.getSelectedItem());
                 dispose();
             });
 
             add(new JLabel("Board Style:"));
             add(boardStyleCombo);
-            add(new JLabel("Piece Style:"));//not implemented 
+            add(new JLabel("Piece Style:"));
             add(pieceStyleCombo);
             add(new JLabel("Board Size:"));
             add(boardSizeCombo);
             add(new JLabel(""));
             add(applyButton);
-
             pack();
             setLocationRelativeTo(parent);
         }
     }
 
-	
-   // main function
     public static void main(String[] args) {
-        //create frame
         JFrame frame = new JFrame("Menu Bar");
-        frame.setSize(300,400);
-
-        //create a bar
+        frame.setSize(300, 400);
         JMenuBar menuBar = new JMenuBar();
-        //create menu files
         JMenu files = new JMenu("File");
-        //create menu edit
-        JMenu edit = new JMenu("debug");//will use to turn on global debug sop's
-        // create new game,save game, and load game for files
+        JMenu edit = new JMenu("Debug");
         JMenuItem newGame = new JMenuItem("New Game");
         JMenuItem saveGame = new JMenuItem("Save Game");
         JMenuItem loadGame = new JMenuItem("Load Game");
         JMenuItem exitGame = new JMenuItem("Exit Game");
-        // add to the files
+
         files.add(newGame);
         files.add(saveGame);
         files.add(loadGame);
         files.add(exitGame);
-        //add to menuBar
         menuBar.add(files);
 
-
-
-        // create additional menu named option
         JMenu option = new JMenu("Option");
-		//JMenuItem debugItem = new JMenuItem("Debug");
         JMenuItem settingItem = new JMenuItem("Setting");
         ChessBoardGUI gui = new ChessBoardGUI();
         settingItem.addActionListener(e -> gui.new SettingsWindow(frame).setVisible(true));
         option.add(settingItem);
         menuBar.add(option);
 
-		//set menubar to the frame
-        frame.setJMenuBar(menuBar);
-        frame.setVisible(true);
-
-        frame.setJMenuBar(menuBar);
-
+        JMenuItem debugItem = new JMenuItem("Debug");
+        debugItem.addActionListener(e -> ChessBoardGUI.debug = !ChessBoardGUI.debug);
+        edit.add(debugItem);
         menuBar.add(edit);
-        //set menubar to the frame
-		JMenuItem debugItem = new JMenuItem("Debug");
+
         frame.setJMenuBar(menuBar);
         frame.setVisible(true);
-debugItem.addActionListener(e -> {
-            // This toggles the boolean variable
-            ChessBoardGUI.debug = !ChessBoardGUI.debug;
-        });
 
-        // create a single instance of the game
         ChessBoardGUI[] gameInstance = new ChessBoardGUI[1];
-        
-        // new game
-		newGame.addActionListener(e -> {
-            gameInstance[0] = new ChessBoardGUI();
-        });
-		//save game
+
+        newGame.addActionListener(e -> gameInstance[0] = new ChessBoardGUI());
         saveGame.addActionListener(e -> {
-            if (gameInstance[0] != null) {
-                gameInstance[0].saveGameToFile("chess_save.txt");
-            }   
+            if (gameInstance[0] != null) gameInstance[0].saveGameToFile("chess_save.txt");
         });
-		//load game
-        loadGame.addActionListener(e ->{
-            if (gameInstance[0] != null){
-                gameInstance[0].loadGameFromFile("chess_save.txt");
-            }
+        loadGame.addActionListener(e -> {
+            if (gameInstance[0] != null) gameInstance[0].loadGameFromFile("chess_save.txt");
         });
-		//exit game
         exitGame.addActionListener(e -> System.exit(0));
-            
     }
-} 
+}
