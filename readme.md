@@ -1,5 +1,5 @@
 
-GUI Chess Game Project
+# GUI Chess Game Project
 
 This project is a GUI-based Chess game developed as part of TXST Object-Oriented Programming course. It combines backend logic with a graphical interface built over the course of three phases, creating a complete chess game experience with full gameplay functionality.
 
@@ -8,41 +8,39 @@ This project is a GUI-based Chess game developed as part of TXST Object-Oriented
 
 # Team Name: ChessTeam4
 
-## Team Members:
+Team Members:
   Corbin, 
   Josh,
   En
   
-###Preview:
-GUI Preview
+### Preview:
 
-### the class Diagram
+![GUI Preview](GUI_preview.png)
 
+### Class Diagram:
 
-###Instructions for how to compile, start, and run the chess game
+![Class Diagram](class%20diagram.pdf)
+
+### Instructions for how to compile, start, and run the chess game
+
 Follow these instructions to compile and run the project:
-  1. Clone the Respository:
-     git clone [http.....]
-  3. Compile the Code:
-     javac........
-  5. Run the Game:
-     java......
+  1. Clone the Respository: git clone [http.....]
+  2. Compile the Code: javac........
+  3. Run the Game: java......
 
-###Features checklist
- [] GUI with an 8*8 ChessBoard
- [] Piece Movement with Mouse Interaction
- [] Move Validation Based on Chess rule
- [] Capture Mechanism
- [] Check and Checkmate Detection
- [] Turn-Based Play for Two Players
- [] Game End Notification on Checkmate
+### Features Checklist
+- [ ] GUI with an 8x8 ChessBoard
+- [ ] Piece Movement with Mouse Interaction
+- [ ] Move Validation Based on Chess rule
+- [ ] Capture Mechanism
+- [ ] Check and Checkmate Detection
+- [ ] Turn-Based Play for Two Players
+- [ ] Game End Notification on Checkmate
 
-Note: Check each box as your inplement these features.
+## Additional Information
+For details on Phases 1 and 2, please refer to "group/PH1" and "group/ph2" for their implementations. Detailed documentation for those phases is not included in this README.
 
-Additional Information
-For details on Phase 1 and 2, please refer to the [   ] designed for those implementations. Detailed documentation for those phases is not included in this README.
-
-Acknoledgements
+## Acknoledgements
 Special thanks to Dr. Xiaomin Li and our team members for their support and collaboration.
 
 
